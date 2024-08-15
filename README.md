@@ -25,7 +25,7 @@ Uses RFEX by Agulto et al 2023
     ```bash
     pip install virtualenv
     virtualenv apcs
-    myenv\Scripts\activate
+    apcs\Scripts\activate
     ```
 
     Run if activate script fails
