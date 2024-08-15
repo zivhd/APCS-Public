@@ -1,0 +1,11 @@
+.env
+__pycache__/extract_frames.cpython-312.pyc
+*.pyc
+*.pyc
+*.pyc
+__pycache__/extract_frames.cpython-312.pyc
+*.pyc
+reset.py
+reset.py
+venv/
+apcs/

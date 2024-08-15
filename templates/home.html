@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block head %}
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+{% endblock %}
+{% block content %}
+<div class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8 bg-slate-100">
+    <p class="text-4xl text-orange-600 font-bold px-5 mt-12">Dashboard</p>
+    {% if role == "Contributor" %}
+    <div class="grid grid-cols-3 gap-4  grid-flow-row p-5">
+        {% else %}
+        <div class="grid grid-cols-4 gap-4  grid-flow-row p-5">
+        {%endif%}
+        <div class="container px-6 py-6 bg-white shadow-md rounded">
+            <p class="text-2xl font-bold mb-2">{{ unvalidated_count }}</p>
+            <p class="text-base text-gray-700 font-medium mb-5">New Contributions</p>
+            {% if role == "TPMO" or role == "Admin"%}
+            <a href='/qualitycontrol' class="font-semibold leading-6 text-orange-600 hover:text-orange-500">View in Quality Control</a>
+            {%endif%}
+        </div>
+        
+        <div class="container px-6 py-6 bg-white shadow-md rounded">
+            <p class="text-2xl font-bold mb-2">{{ recently_validated }}</p>
+            <p class="text-base text-gray-700 font-medium mb-5">Recently Approved Contributions</p>
+            {% if role == "Engineering" or role == "Admin"%}
+            <a href='/explore' class="font-semibold leading-6 text-orange-600 hover:text-orange-500">View in Explore</a>
+            {%endif%}
+        </div>
+        
+        <div class="container px-6 py-6 bg-white shadow-md rounded">
+            <p id="noPotholes" class="text-2xl font-bold mb-2"></p>
+            <p class="text-base text-gray-700 font-medium mb-5">Total Number of Potholes</p>
+            {% if role == "Engineering" or role == "Admin"%}
+            <a href='/explore' class="font-semibold leading-6 text-orange-600 hover:text-orange-500">View in Explore</a>
+            {%endif%}
+        </div>
+        {% if role != "Contributor" %}
+        <div class="container px-6 py-6 bg-white shadow-md rounded">
+            <p id="noJOs" class="text-2xl font-bold mb-2">{{ duejoborders }}</p>
+            <p class="text-base text-gray-700 font-medium mb-5">Number of Job Orders To Start This Week</p>
+            {% if role == "Engineering" or role == "Admin"%}
+            <a href='/job_order_list' class="font-semibold leading-6 text-orange-600 hover:text-orange-500">View in Job Orders</a>
+            {%endif%}
+        </div>
+        {%endif%}
+    </div>
+    <div class="grid grid-cols-6 gap-4 grid-flow-row-dense p-5">
+        <div class="container col-span-3 px-6 py-6 bg-white shadow-md rounded">
+            <div id="priority-chart" class="text-center"></div>
+        </div>
+        <div class="container col-span-3 px-6 py-6 bg-white shadow-md rounded">
+            <div id="priority-pie-chart" class="text-center"></div>
+        </div>
+        <div class="container col-span-3 px-6 py-6 bg-white shadow-md rounded">
+            <div class="top-segments">
+                <p class="text-base text-gray-700 font-medium mb-5">Top 10 Highest Priority Road Segments with Potholes</p>
+                <table id="top-segments-table" class="w-full table-auto">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Priority</th>
+                            <th>Roads</th>
+                            <th>Job Order</th>
+                            <th>Action</th>
+                            
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+        
+        <div class="container col-span-3 px-6 py-6 bg-white shadow-md rounded">
+            <div class="top-barangay-segments">
+                <p class="text-base text-gray-700 font-medium mb-5">Top 10 Barangays with Most Road Segments with Potholes </p>
+                <table id="top-barangay-segments-table" class="w-full table-auto">
+                    <thead>
+                        <tr>
+                            <th class="text-center">Barangay</th>
+                            <th class="text-center">Count</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="{{ url_for('static', filename='home.js') }}"></script>
+{% endblock %}

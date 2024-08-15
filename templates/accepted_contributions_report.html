@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% block title %}Accepted Contributions Report{% endblock %}
+{% block head %}
+<style>
+    /* Define styles for the notification */
+    .notification {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 20px;
+        border-radius: 5px;
+        z-index: 1000;
+        display: none; /* Initially hide the notification */
+    }
+</style>
+{% endblock %}
+{% block content %}
+<div class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8 bg-slate-100">
+    <p class="text-4xl text-orange-600 font-bold px-5 mt-12">Accepted Contributions Report</p>
+    <div class="grid grid-cols-4 gap-4 grid-flow-row-dense p-5">
+        <!-- Enclosed Table in White Box -->
+        <div class="container col-span-4 px-6 py-6 bg-white shadow-md rounded">
+            {% if contributions %}
+            <table id="contributions-table" class="w-full table-auto">
+                <thead>
+                    <tr>
+                        <th>Contribution Date</th>
+                        <th>Road Name</th>
+                        <th>Barangay</th>
+                        <th>Contributor</th>
+                        <th>Contributor Role</th>
+                        <th>Validator</th>
+                        <th>Validation Date</th>
+                        <!-- Add more table headers as needed -->
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for contribution in contributions %}
+                        <tr>
+                            <td>{{ contribution.timestamp }}</td>
+                            <td>{{ contribution.road_name }}</td>
+                            <td>{{ contribution.barangay }}</td>
+                            <td>{{ contribution.contributor }}</td>
+                            <td>{{ contribution.contributor_role }}</td>
+                            <td>{{ contribution.validator }}</td>
+                            <td>{{ contribution.validation_date }}</td>
+                            <!-- Add more table data fields as needed -->
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p>No records found.</p>
+            {% endif %}
+        </div>
+    </div>
+    <!-- Download as PDF Button -->
+    <div class="text-center mt-8">
+        <a href="#" id="download-pdf-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded inline-block">
+            Download as PDF
+        </a>
+        <a href="/reports" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded inline-block">
+            Go back to Reports
+        </a>
+    </div>
+    <!-- Notification -->
+    <div id="notification" class="notification">PDF Downloaded Successfully</div>
+</div>
+<script>
+    document.getElementById('download-pdf-btn').addEventListener('click', function () {
+        var printContents = document.getElementById('contributions-table').outerHTML;
+        var originalContents = document.body.innerHTML;
+        document.body.innerHTML = printContents;
+        window.print();
+        document.body.innerHTML = originalContents;
+        // Show the notification
+        document.getElementById('notification').style.display = 'block';
+        // Hide the notification after 3 seconds
+        setTimeout(function() {
+            document.getElementById('notification').style.display = 'none';
+        }, 3000);
+    });
+</script>
+
+{% endblock %}

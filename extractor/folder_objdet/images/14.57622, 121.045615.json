@@ -1,0 +1,35 @@
+{
+    "images": [
+        {
+            "filename": "14.57622, 121.045615.jpg", 
+            "objects": [
+                {
+                    "class": 1, 
+                    "bounding_box": [
+                        1347, 
+                        838, 
+                        1376, 
+                        943
+                    ], 
+                    "bottom_center": [
+                        1361, 
+                        943
+                    ]
+                }, 
+                {
+                    "class": 1, 
+                    "bounding_box": [
+                        1404, 
+                        853, 
+                        1438, 
+                        994
+                    ], 
+                    "bottom_center": [
+                        1421, 
+                        994
+                    ]
+                }
+            ]
+        }
+    ]
+}

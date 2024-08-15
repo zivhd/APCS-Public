@@ -1,0 +1,119 @@
+<!-- base.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{url_for('static',filename='dist/css/output.css')}}">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicon.png') }}">
+
+
+    <title>{% block title %}{% endblock %}</title>
+    {% block head %} {% endblock %}
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="bg-gradient-to-r from-orange-600 via-orange-500 to-orange-400 text-white" style="position: fixed; width: 100%; z-index: 999;">
+    <div class="container m-auto p-3 flex justify-center items-center">
+        <div class="h-[40px] flex items-center text-black w-[100%]">
+            
+            <!-- Modified the logo placement and size -->
+            <img src="{{url_for('static', filename='images/logo.png')}}" alt="Logo" class="float-left h-12 w-auto" />
+            <div class="text-1xl font-bold text-white float-left"> <a href="/"> APCS </a></div>
+            <p class="text-1xl font-bold text-white float-left ml-10">Welcome back, {{ fname }}! ({{ role }})</p> 
+            <div id="menu" class="hidden sm:flex md:flex-row flex-col gap-4 absolute md:relative top-[50px] md:top-[inherit] bg-white md:bg-transparent w-[80%] left-0 right-0 m-auto md:w-auto md:left-auto md:right-auto text-orange-600 md:text-white py-10 md:p-0 md:gap-8">
+                <a href="/" class="hidden sm:block font-semibold leading-6 hover:text-orange-200 border-b-2 hover:border-orange-200  py-2 flex items-center {{ 'border-b-2 border-orange-200 text-orange-200' if request.path == '/' else '' }}" style="font-size: smaller">
+                    <ion-icon name="home" class="mr-2"></ion-icon> Home
+                </a>
+                <a href="/contribution" class="font-semibold leading-6 hover:text-orange-200 border-b-2 hover:border-orange-200 py-2 flex items-center {{ 'border-b-2 border-orange-200 text-orange-200' if request.path == '/contribution' else '' }} " style="font-size: smaller">
+                    <ion-icon name="cloud-upload" class="mr-2"></ion-icon> Contribute
+                </a>
+                <a href="/explore" class="font-semibold leading-6 hover:text-orange-200 border-b-2 hover:border-orange-200 py-2 flex items-center {{ 'border-b-2 border-orange-200 text-orange-200' if request.path == '/explore' else '' }}" style="font-size: smaller">
+                    <ion-icon name="search" class="mr-2"></ion-icon> Explore
+                </a>
+                {% if role == "Engineering" or role == "Engineering Head" or role == "Admin"%}
+                <a href="/job_order_list" class="hidden sm:block font-semibold leading-6 hover:text-orange-200 border-b-2 hover:border-orange-200 py-2 flex items-center {{ 'border-b-2 border-orange-200 text-orange-200' if request.path == '/job_order_list' else '' }}" style="font-size: smaller">
+                    <ion-icon name="briefcase" class="mr-2"></ion-icon> Job Orders
+                </a>
+                {%endif%}
+                {% if role == "None"%}
+                <a href="/login" class="font-semibold leading-6 hover:text-orange-200 border-b-2 hover:border-orange-200 py-2 flex items-center {{ 'border-b-2 border-orange-200 text-orange-200' if request.path == '/login' else '' }}" style="font-size: smaller">
+                    <ion-icon name="log-in" class="mr-2"></ion-icon> Login
+                </a>
+                {%endif%}
+                {% if role == "Admin"%}
+                <a href="/users" class="hidden sm:block font-semibold leading-6 hover:text-orange-200 border-b-2 hover:border-orange-200 py-2 flex items-center {{ 'border-b-2 border-orange-200 text-orange-200' if request.path == '/users' else '' }}" style="font-size: smaller">
+                    <ion-icon name="people" class="mr-2"></ion-icon> Users
+                </a>
+                {%endif%}
+                {% if role == "TPMO" or role == "Admin"%}
+                <a href="/qualitycontrol" class="hidden sm:block font-semibold leading-6 hover:text-orange-200 border-b-2 hover:border-orange-200 py-2 flex items-center {{ 'border-b-2 border-orange-200 text-orange-200' if request.path == '/qualitycontrol' else '' }} relative" style="font-size: smaller">
+                    {% if contribcount%}
+                    <span class="bg-red-500 text-white rounded-full px-2 py-1 absolute top-0 right-0 -mt-2 mr-2 text-xs">{{ contribcount }}</span>
+                    {% endif %}
+                    <ion-icon name="checkmark-circle" class="mr-2"></ion-icon> Quality Control
+                    
+                </a>
+                {% endif %}
+                {% if role == "TPMO Head" or role == "Admin"%}
+                <a href="/head_qualitycontrol" class="hidden sm:block font-semibold leading-6 hover:text-orange-200 border-b-2 hover:border-orange-200 py-2 flex items-center {{ 'border-b-2 border-orange-200 text-orange-200' if request.path == '/qualitycontrol' else '' }} relative" style="font-size: smaller">
+                    {% if head_contribcount%}
+                    <span class="bg-red-500 text-white rounded-full px-2 py-1 absolute top-0 right-0 -mt-2 mr-2 text-xs">{{ head_contribcount }}</span>
+                    {% endif %}
+                    <ion-icon name="checkmark-circle" class="mr-2"></ion-icon> Quality Control (Head)
+                </a>
+                {% endif %}
+                {% if role == "None"%}
+                <a href="/signup" class="hidden sm:block font-semibold leading-6 hover:text-orange-200 border-b-2 hover:border-orange-200 py-2 flex items-center {{ 'border-b-2 border-orange-200 text-orange-200' if request.path == '/signup' else '' }}" style="font-size: smaller">
+                    <ion-icon name="person-add" class="mr-2"></ion-icon> Sign upsignup
+                </a>
+                {%endif%}
+                <a href="/about" class="hidden sm:block font-semibold leading-6 hover:text-orange-200 border-b-2 hover:border-orange-200 py-2 flex items-center {{ 'border-b-2 border-orange-200 text-orange-200' if request.path == '/about' else '' }}" style="font-size: smaller">
+                    <ion-icon name="information-circle" class="mr-2"></ion-icon> About Us
+                </a>
+                <a href="/contactus" class="hidden sm:block font-semibold leading-6 hover:text-orange-200 border-b-2 hover:border-orange-200 py-2 flex items-center {{ 'border-b-2 border-orange-200 text-orange-200' if request.path == '/contactus' else '' }}" style="font-size: smaller">
+                    <ion-icon name="mail" class="mr-2"></ion-icon> Contact Us
+                </a>
+                {% if role == "Engineering" or role == "TPMO" or role == "Admin" or role == "TPMO Head" or role == "Engineering Head"%}
+                <a href="/reports" class="hidden sm:block font-semibold leading-6 hover:text-orange-200 border-b-2 hover:border-orange-200 py-2 flex items-center {{ 'border-b-2 border-orange-200 text-orange-200' if request.path == '/reports' else '' }}" style="font-size: smaller">
+                    <ion-icon name="book" class="mr-2"></ion-icon> Reports
+                </a>
+                {% endif %}
+                <a href="/logout" class="font-semibold leading-6  py-2 flex items-center text-xl hover:text-orange-200 py-2 flex items-center {{ 'border-b-2 border-orange-200 text-orange-200' if request.path == '/logout' else '' }}" style="font-size: smaller">
+                    <ion-icon name="log-out" class="mr-2"></ion-icon> Log Out
+                </a>
+            </div>
+        </div>
+        <div class="text-2xl cursor-pointer md:hidden flex justify-end grow">
+            <ion-icon id="menuToggle" class="cursor-pointer" name="menu"></ion-icon>
+        </div>             
+    </div>
+    <script src="https://unpkg.com/ionicons@4.5.10-0/dist/ionicons.js"></script>
+    <script>
+        document.querySelector('#menuToggle').addEventListener('click', () => {
+            let menu = document.getElementById('menu');
+            menu.classList.toggle('hidden'); // Toggle the class that positions the menu properly
+        });
+        if (/Mobi|Android/i.test(navigator.userAgent)) {
+            // Redirect to another page only if not already on that page
+            if(window.location.href.includes("/explore") ){
+                console.log("nothing")
+            }
+            else if (!window.location.href.includes("/contribution")  ) {
+                window.location.href = "/contribution";
+            }
+        }
+    </script>
+    
+</nav>
+
+<!-- Content -->
+<div class="content">
+    {% block content %}{% endblock %}
+</div>
+
+</body>
+</html>

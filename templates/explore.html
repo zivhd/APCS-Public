@@ -1,0 +1,404 @@
+{% extends 'base.html' %} {% block title %}Explore{% endblock %} {% block head
+%}
+<script src="https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.js"></script>
+<link
+  href="https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.css"
+  rel="stylesheet"
+/>
+<script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-heatmap/v0.1.0/mapbox-gl-heatmap.js"></script>
+<script
+  type="text/javascript"
+  src="{{ url_for('static', filename='maps.js') }}"
+></script>
+<script
+  type="text/javascript"
+  src="{{ url_for('static', filename='explore.js') }}"
+></script>
+<style>
+  .notification {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 10px;
+    background-color: red;
+    color: white;
+    text-align: center;
+    z-index: 9999; /* Ensure it's above other elements */
+  }
+
+  /* Tooltip container */
+  .tooltip {
+    position: relative;
+    display: inline-block;
+  }
+
+  /* Information icon style */
+  .tooltip-icon {
+    font-size: 0.80rem;
+    color: #6b7280; /* Adjust color as needed */
+    cursor: pointer; /* Show pointer cursor on hover */
+    border-radius: 50%; /* Make the icon rounded */
+    background-color: #fff; /* Optionally add background color */
+    display: inline-block;
+    width: 20px; /* Adjust width as needed */
+    height: 20px; /* Adjust height as needed */
+    text-align: center;
+    line-height: 20px; /* Adjust line height to vertically center the icon */
+    border: 2px solid #6b7280; /* Optionally add border */
+  }
+
+  /* Tooltip text */
+  .tooltip .tooltiptext {
+    align-self: center;
+    visibility: hidden;
+    width: 400px;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  /* Show the tooltip text when you mouse over the tooltip container */
+  .tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+  }
+</style>
+{% endblock %} {% block content %}
+
+<div id = "loading-bar" class="hidden fixed top-0 left-0 w-full h-full z-50 flex items-center justify-center">
+  <div class="absolute inset-0 bg-black opacity-50"></div>
+  <button type="button" class="relative bg-orange-500 h-max w-max rounded-lg text-white font-bold hover:bg-indigo-300 hover:cursor-not-allowed duration-[500ms,800ms]" disabled>
+    <div class="flex items-center justify-center m-[10px]"> 
+        <div class="h-5 w-5 border-t-transparent border-solid animate-spin rounded-full border-white border-4"></div>
+        <div class="ml-2"> Processing... <div>
+    </div>
+</button>
+</div>
+
+
+  <div id="map" class="w-screen h-screen block "></div>
+  <div
+    id="menu"
+    class=" bg-white shadow-md rounded absolute bottom-36 right-6 p-4 border-r-5"
+  >
+  <label class="block ">
+    <p class="font-bold text-center">Layers</p>
+  </label>
+    <label id ="toggleSegmentsButtonLabel" class="block cursor-pointer bg-orange-200 rounded px-2 mb-2">
+      <button id="toggleSegmentsButton">Segments</button>
+    </label>
+    <label id = "togglePotholesButtonLabel"class="block cursor-pointer bg-slate-200 rounded px-2">
+      <button id="togglePotholesButton" class = "bg-slate-00">Potholes</button>
+    </label>
+    
+  </div>
+  <div
+  id="filterMenu"
+  class="bg-white shadow-md rounded absolute bottom-6 right-6 p-4 border-r-5"
+>
+  <label class="block">
+    <p class="font-bold text-center">Filter by</p>
+  </label>
+  
+  <label id="statusDropdownLabel">
+    <select id="statusDropdown" class = "block cursor-pointer">
+      <option value="asdgadg" disabled selected>Status</option>
+      <option value="none">None</option>
+      <option value="In Progress">Work In Progress</option>
+      <option value="For Approval">For Approval</option>
+    </select>
+  </label>
+
+  <label id="priorityLevelDropdownLabel" class="block cursor-pointer">
+    <select id="priorityLevelDropdown">
+      <option value="" disabled selected>Priority Level</option>
+      <option value="none">None</option>
+      <option value="High">High</option>
+      <option value="Medium-High">Medium-High</option>
+      <option value="Medium-Low">Medium-Low</option>
+      <option value="Low">Low</option>
+    </select>
+  </label>
+
+</div>
+
+  <div id="legends" class="bg-white shadow-md rounded absolute bottom-6 left-6 p-1 border-r-5 ">
+    <label class="block ">
+      <p class="font-bold text-center mt-3">Legend</p>
+    </label>
+    <label class="  rounded px-1 py-2 mb-2 flex items-center">
+     <img src="{{ url_for('static', filename='images/road.png') }}" class="max-w-6 ml-2 mr-1">  Segment 
+    </label>
+    <label class="  rounded px-1 py-2 mb-2 flex items-center">
+       <img src="{{ url_for('static', filename='images/pothole.png') }}" class="max-w-6 ml-2 mr-1"> Pothole
+    </label>
+    <label class="  rounded px-1  py-2 mb-2 flex items-center">
+      <img src="{{ url_for('static', filename='images/wip.png') }}" class="max-w-6 ml-2 mr-1">   Work in Progress
+    </label>
+
+    <label class="  rounded px-1  py-2 mb-2 flex items-center">
+      <img src="{{ url_for('static', filename='images/testing.png') }}" class="max-w-6 ml-2 mr-1">   For Approval
+    </label>
+
+    <label class="  rounded px-1 py-2 mb-2 flex items-center">
+      <div class="w-6 h-6  rounded-full bg-[#FF0000] ml-2 mr-1"></div>  High
+    </label>
+
+    <label class="  rounded px-1  py-2 mb-2 flex items-center">
+      <div class="w-6 h-6  rounded-full bg-[#FFA500] ml-2 mr-1"></div>   Medium-High
+    </label>
+
+    <label class="  rounded px-1  py-2 mb-2 flex items-center">
+      <div class="w-6 h-6  rounded-full bg-[#FFFF00] ml-2 mr-1"></div>  Medium-Low
+    </label>
+    <label class="  rounded px-1  py-2 mb-2 flex items-center">
+      <div class="w-6 h-6  rounded-full bg-[#008000] ml-2 mr-1"></div>  Low
+    </label>
+
+    
+  </div>
+  
+
+  <div
+  id="holidayModal"
+  class="modal hidden fixed inset-0 flex items-center bg-opacity-75 z-50 overflow-auto"
+>
+  <div
+    class="modal-container bg-white w-full md:max-w-screen-lg mx-auto rounded shadow-lg z-50 overflow-y-auto"
+  >
+    <div class="modal-content py-4 text-left px-6">
+      <div class="flex justify-between items-center pb-3">
+        <p class="text-2xl font-bold">Holiday Notification</p>
+        <button class="modal-close cursor-pointer z-50" onclick="closeHolidayModal()">
+          <svg
+            class="fill-current text-black"
+            xmlns="http://www.w3.org/2000/svg"
+            width="18"
+            height="18"
+            viewBox="0 0 18 18"
+          >
+            <path d="M1 1l16 16m0-16L1 17"></path>
+          </svg>
+        </button>
+      </div>
+      <div class="text-gray-700 ">
+        <p id="holidayMessage"></p>
+      </div>
+      <button
+        class="float-right bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mt-3 mb-5"
+        onclick="closeHolidayModal()"
+      >
+        Close
+      </button>
+    </div>
+  </div>
+</div>
+<div
+  id="myModal"
+  class="modal hidden fixed inset-0 flex items-center bg-opacity-75 z-50 overflow-auto"
+>
+  <div
+    class="modal-container bg-white w-full md:max-w-screen-lg mx-auto rounded shadow-lg z-50 overflow-y-auto"
+  >
+    <div class="modal-content py-4 text-left px-6">
+      <div class="flex justify-between items-center pb-3">
+        <p class="text-2xl font-bold">Segment Information</p>
+        <button class="modal-close cursor-pointer z-50" onclick="closeModal()">
+          <svg
+            class="fill-current text-black"
+            xmlns="http://www.w3.org/2000/svg"
+            width="18"
+            height="18"
+            viewBox="0 0 18 18"
+          >
+            <path d="M1 1l16 16m0-16L1 17"></path>
+          </svg>
+        </button>
+      </div>
+      <div id="modal-content" class="text-gray-700 "></div>
+      <button id = "showPotholesButton" class="float-left bg-red-500 hover:bg-red-700 text-white font-bold ml-4 mt-3 py-2 px-4 rounded focus:outline-none focus:shadow-outline" >Show Potholes</button>
+      <button
+        class="float-right bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mt-3 mb-5"
+        onclick="closeModal()"
+      >
+        Close
+      </button>
+    </div>
+  </div>
+</div>
+
+<div id="potholeModal" class="modal hidden fixed inset-0 flex items-center bg-opacity-75 z-50 overflow-auto mt-10">
+  <div class="modal-container bg-white md:max-w-md mx-auto rounded shadow-lg z-50 overflow-y-auto" style="padding-right: 1rem;">
+      <div class="modal-content py-4 text-left px-6">
+          <div class="flex justify-between items-center pb-3">
+              <p class="text-2xl font-bold">Pothole Information</p>
+              <button class="modal-close cursor-pointer z-50" onclick="closePotholeModal()">
+                  <svg class="fill-current text-black" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18">
+                      <path d="M1 1l16 16m0-16L1 17"></path>
+                  </svg>
+              </button>
+          </div>
+          <div id="pothole-modal-content" class="text-gray-700"></div>
+          <button class="float-right bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mt-3 mb-5" onclick="closePotholeModal()">Close</button>
+      </div>
+  </div>
+</div>
+
+<!-- Modal for displaying job order details -->
+<div id="jobOrderModal" class="fixed z-10 inset-0 overflow-y-auto hidden">
+  <div class="flex items-center justify-center min-h-screen">
+    <div class="bg-white p-8 max-w-lg m-auto rounded shadow-xl">
+      <div class="flex justify-between mb-4">
+        <h2 class="text-2xl font-bold text-gray-800">Job Order Details</h2>
+        <button class="text-blue-500 hover:text-blue-700 focus:outline-none" id="modalCloseBtn">&times;</button>
+      </div>
+      <div id="jobOrderDetails">
+        <div class="mb-4">
+          <span class="font-semibold">Barangays Affected:</span>
+          <span id="barangaysAffected"></span>
+        </div>
+        <div class="mb-4">
+          <span class="font-semibold">Priority Level:</span>
+          <span id="priorityLevel"></span>
+        </div>
+        <div class="mb-4">
+          <span class="font-semibold">Person Responsible:</span>
+          <span id="personResponsible"></span>
+        </div>
+        <!-- You can add more details here -->
+      </div>
+      <div class="flex justify-end mt-6">
+        <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 mr-2 rounded" id="editBtn">Edit Job Order</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+  // Fetch potholes data
+  fetch("/potholes")
+    .then((response) => response.json())
+    .then((data) => {
+      potholes = data;
+
+      // Fetch segments data
+      fetch("/segments")
+        .then((response) => response.json())
+        .then((segmentData) => {
+          segments = segmentData;
+          console.log(segments);
+          const urlParams = new URLSearchParams(window.location.search);
+          const segmentId = urlParams.get("segment_id");
+          // Call display_map with both potholes and segments data
+          if (!segmentId) {
+            display_map("{{mapbox_access_token}}", potholes, segments, null, "{{role}}", "{{user_id}}");
+          }
+          // Check if there's a segment ID in the URL
+
+          if (segmentId) {
+            // Fetch segment data and open the modal
+            fetch(`/get_segment/${segmentId}`)
+              .then((response) => response.json())
+              .then((segment) => {
+                coordinates = segment.snapped_to_road_points.map((point) => [
+                  point.location.longitude,
+                  point.location.latitude,
+                ]);
+
+                midpoint = calculateMidpoint(coordinates);
+                console.log("MIDPOINT" + midpoint);
+                console.log(midpoint[0])
+                display_map("{{mapbox_access_token}}", potholes, segments,midpoint,"{{role}}","{{user_id}}");
+
+                openModal(segment,"{{role}}","{{user_id}}");
+              })
+              .catch((error) =>
+                console.error("Error fetching segment:", error)
+              );
+            const newUrlParams = new URLSearchParams(window.location.search);
+            newUrlParams.delete("segment_id");
+            const newUrl = `${
+              window.location.pathname
+            }?${newUrlParams.toString()}`;
+            history.replaceState(null, "", newUrl);
+          }
+        })
+        .catch((error) => console.error("Error fetching segments:", error));
+    })
+    .catch((error) => console.error("Error fetching potholes:", error));
+
+    var currentYear = new Date().getFullYear();
+
+// Define holidays for the Philippines (with dates adjusted for the current year)
+var holidays = {
+    "New Year's Day": new Date(currentYear, 0, 1),
+    "Valentine's Day": new Date(currentYear, 1, 14),
+    "Maundy Thursday": calculateEaster(currentYear, -3),
+    "Good Friday": calculateEaster(currentYear, -2),
+    "Christmas Day": new Date(currentYear, 11, 25),
+    "All Saints and All Souls' Day": new Date(currentYear, 10, 2),
+    "Feast of the Immaculate Conception": new Date(currentYear, 11, 8),
+    "Rizal Day": new Date(currentYear, 11, 30),
+    // Add more holidays here...
+};
+
+// Function to calculate Easter Sunday
+function calculateEaster(year, offset) {
+    var a = year % 19;
+    var b = Math.floor(year / 100);
+    var c = year % 100;
+    var d = Math.floor(b / 4);
+    var e = b % 4;
+    var f = Math.floor((b + 8) / 25);
+    var g = Math.floor((b - f + 1) / 3);
+    var h = (19 * a + b - d - g + 15) % 30;
+    var i = Math.floor(c / 4);
+    var k = c % 4;
+    var l = (32 + 2 * e + 2 * i - h - k) % 7;
+    var m = Math.floor((a + 11 * h + 22 * l) / 451);
+    var month = Math.floor((h + l - 7 * m + 114) / 31);
+    var day = ((h + l - 7 * m + 114) % 31) + 1;
+    return new Date(year, month - 1, day + offset);
+}
+
+// Check if current date is within range of any holiday
+var today = new Date();
+var withinRange = false;
+var holidayName = "";
+
+Object.keys(holidays).forEach(function (holiday) {
+    var holidayDate = holidays[holiday];
+    var daysDifference = Math.ceil((holidayDate - today) / (1000 * 3600 * 24));
+    if (daysDifference >= 0 && daysDifference <= 3) {
+        withinRange = true;
+        holidayName = holiday;
+    }
+});
+
+if (withinRange) {
+    document.getElementById('holidayMessage').innerText = "Expect worsened traffic due to " + holidayName + ".";
+    openHolidayModal();
+}
+
+// Function to open the holiday modal
+function openHolidayModal() {
+    document.getElementById('holidayModal').classList.remove('hidden');
+}
+
+// Function to close the holiday modal
+function closeHolidayModal() {
+    document.getElementById('holidayModal').classList.add('hidden');
+}
+
+</script>
+
+{% endblock %}

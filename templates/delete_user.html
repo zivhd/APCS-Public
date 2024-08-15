@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete User{% endblock %}
+
+{% block content %}
+  <h2>Delete User</h2>
+  <p>Are you sure you want to delete the user '{{ user["fname"] }} {{ user["lname"] }}'?</p>
+  <form method="post" action="{{ url_for('delete_user', user_id=user['_id']) }}">
+    <input type="submit" value="Delete">
+  </form>
+{% endblock %}

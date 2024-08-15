@@ -1,0 +1,48 @@
+{
+    "images": [
+        {
+            "filename": "14.57634333, 121.04542833.jpg", 
+            "objects": [
+                {
+                    "class": 2, 
+                    "bounding_box": [
+                        1752, 
+                        764, 
+                        1801, 
+                        904
+                    ], 
+                    "bottom_center": [
+                        1776, 
+                        904
+                    ]
+                }, 
+                {
+                    "class": 0, 
+                    "bounding_box": [
+                        381, 
+                        694, 
+                        596, 
+                        941
+                    ], 
+                    "bottom_center": [
+                        489, 
+                        941
+                    ]
+                }, 
+                {
+                    "class": 1, 
+                    "bounding_box": [
+                        1754, 
+                        764, 
+                        1800, 
+                        906
+                    ], 
+                    "bottom_center": [
+                        1777, 
+                        906
+                    ]
+                }
+            ]
+        }
+    ]
+}

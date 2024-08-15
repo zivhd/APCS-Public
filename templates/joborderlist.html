@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+{% block title %} Job Orders {% endblock %}
+
+{% block content %}
+<style>
+    /* Tooltip text */
+    .tooltip .tooltiptext {
+    align-self: center;
+    visibility: hidden;
+    width: 400px;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  /* Show the tooltip text when you mouse over the tooltip container */
+  .tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+  }
+</style>
+<div id = "loading-bar" class="hidden fixed top-0 left-0 w-full h-full z-50 flex items-center justify-center" style = "z-index: 99999;">
+  <div class="absolute inset-0 bg-black opacity-50"></div>
+  <button type="button" class="relative bg-orange-500 h-max w-max rounded-lg text-white font-bold hover:bg-indigo-300 hover:cursor-not-allowed duration-[500ms,800ms]" disabled>
+    <div class="flex items-center justify-center m-[10px]"> 
+        <div class="h-5 w-5 border-t-transparent border-solid animate-spin rounded-full border-white border-4"></div>
+        <div class="ml-2"> Processing... <div>
+    </div>
+</button>
+</div>
+<div class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8 bg-slate-100">
+  <p class="text-4xl text-orange-600 font-bold px-5 mt-12">Job Orders</p>
+
+  <div class="mt-8 flex"> <!-- Changed to flex container for row layout -->
+    <div class="text-center px-5" style="width: 50%">
+      <div id='calendar' class="calendar-container w-full" style="height: 400px;"></div> <!-- Adjusted width -->
+    </div>
+
+    <div class="flex flex-col space-y-8" style="width: 50%">
+
+      <!-- Pending Job Orders Container -->
+      <div class="container col-span-3 px-6 py-6 bg-white shadow-md rounded w-full">
+        <div class="pending-job-orders">
+          <p class="text-base text-gray-700 font-medium mb-5">Road Segments without Job Orders</p>
+          <table id="pending-job-orders-table" class="w-full table-auto">
+            <thead>
+              <tr>
+                <th>Segment ID</th>
+                <th>Priority</th>
+                <th>Roads</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="pending-job-orders-tbody">
+              <!-- Table body will be populated by JavaScript -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Ongoing Job Orders Container -->
+      <div class="container col-span-3 px-6 py-6 bg-white shadow-md rounded w-full">
+        <div class="ongoing-job-orders">
+          <p class="text-base text-gray-700 font-medium mb-5">Ongoing Job Orders</p>
+          <table id="ongoing-job-orders-table" class="w-full table-auto">
+            <thead>
+              <tr>
+                <th>Segment ID</th>
+                <th>Priority</th>
+                <th>Roads</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="ongoing-job-orders-tbody">
+              <!-- Table body will be populated by JavaScript -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Job Orders for Approval Container -->
+      <div class="container col-span-3 px-6 py-6 bg-white shadow-md rounded w-full">
+        <div class="forapproval-job-orders">
+          <p class="text-base text-gray-700 font-medium mb-5">Job Orders for Approval</p>
+          <table id="forapproval-job-orders-table" class="w-full table-auto">
+            <thead>
+              <tr>
+                <th>Segment ID</th>
+                <th>Priority</th>
+                <th>Roads</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="forapproval-job-orders-tbody">
+              <!-- Table body will be populated by JavaScript -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div id="myModal" class="modal hidden fixed inset-0 flex items-center bg-opacity-75 bg-gray-500 z-50 overflow-auto" style="z-index: 1000;">
+    <div class="modal-container bg-white w-full md:max-w-screen-lg mx-auto rounded shadow-lg z-50 overflow-y-auto">
+      <div class="modal-content py-4 text-left px-6">
+        <div class="flex justify-between items-center pb-3">
+          <p id="modal-title" class="text-2xl font-bold">Job Order Information</p>
+          <button class="modal-close cursor-pointer z-50" onclick="closeModal()">
+            <svg class="fill-current text-black" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18">
+              <path d="M1 1l16 16m0-16L1 17"></path>
+            </svg>
+          </button>
+        </div>
+        <div id="modal-content" class="text-gray-700"></div>
+        <button class="float-right bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mt-3 mb-5" onclick="closeModal()">Close</button>
+      </div>
+    </div>
+  </div>
+</div>  
+
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
+<script
+  type="text/javascript"
+  src="{{ url_for('static', filename='joborders.js') }}"
+></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var calendarEl = document.getElementById('calendar');
+    var events = [];
+    '{% for segment in segments_with_start_date %}'
+    console.log('{{ segment.priority_level }}')
+    var lineColor;
+    if ('{{ segment.priority_level }}' == "High Priority Road Segment") {
+        lineColor = "red"; // Red for High Priority
+    } else if ('{{ segment.priority_level }}' == "Medium-High Priority Road Segment") {
+        lineColor = "orange"; // Orange for Medium-High Priority
+    } else if ('{{ segment.priority_level }}' == "Medium-Low Priority Road Segment") {
+        lineColor = "yellow"; // Yellow for Medium-Low Priority
+    } else {
+        lineColor = "green"; // Green for Low Priority
+    }
+    // Parse completion_date into a JavaScript Date object
+
+    events.push({
+        title: '{{ segment.roads_affected }}', // Display roads affected as the event title
+        start: '{{ segment.start_date }}', // Start date of the event
+        end: '{{ segment.completion_date }}',
+        jobOrderId: '{{ segment._id }}', // Custom property to store job order ID
+        barangaysAffected: '{{ segment.barangays_affected }}', // Custom property to store barangays affected
+        priorityLevel: '{{ segment.priority_level }}', // Custom property to store priority level
+        personResponsible: '{{ segment.person_responsible }}', // Custom property to store person responsible
+        color: lineColor,
+        textColor: '#000000'
+    });
+    '{% endfor %}'
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        events: events,
+        eventClick: function(info) {
+            var event = info.event;
+            var jobOrderId = event.extendedProps.jobOrderId;
+            var barangaysAffected = event.extendedProps.barangaysAffected;
+            var priorityLevel = event.extendedProps.priorityLevel;
+            var personResponsible = event.extendedProps.personResponsible;
+            var segmentId = event.extendedProps.id;
+
+            window.location.href = `/explore?segment_id=${jobOrderId}`;
+        }
+    });
+    calendar.render();
+  });
+</script>
+
+{% endblock %}

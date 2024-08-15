@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}About Us{% endblock %}
+
+{% block content %}
+    <div class="container mx-auto p-4 bg-slate-100 rounded-lg shadow-lg">
+        <div class="text-center mb-6 mt-10">
+            <img src="{{url_for('static', filename='images/about_us_image.png')}}" alt="About Us Image" class="max-w-md mx-auto mb-4 rounded-lg shadow-lg">
+        </div>
+
+        <h1 class="text-4xl font-bold mb-6 text-center text-orange-600">About Us</h1>
+
+        <p class="mb-8 text-lg text-gray-700 text-center">Welcome to the Automatic Priority Classification System!</p>
+
+        <p class="mb-8 text-lg text-gray-800">
+            Developed by passionate students from De La Salle University's BS Information Technology program, our system utilizes the cutting-edge technology of the RFEX (Road Physical Feature Extraction) system. This innovation aims to automate and streamline the priority classification of roads in the Mandaluyong City area for the dedicated officers of the Mandaluyong LGU's TPMO and Engineering Department.
+        </p>
+
+        <p class="mb-8 text-lg text-gray-800">
+            Our mission is to make Mandaluyong City's roadwork prioritization smoother and more effective, ensuring that all residents experience safer and more efficient traffic management. Through our efforts, we contribute to a better quality of life for the entire community.
+        </p>
+
+        <p class="mb-8 text-lg text-gray-800 text-center">
+            Feel free to explore our website and discover the features. If you have any questions or feedback, please don't hesitate to <a href="/contactus" class="text-orange-600 hover:underline">contact us</a>.
+        </p>
+
+        <div class="bg-orange-600 text-white p-6 rounded-md text-center">
+            <p class="font-semibold text-lg">Join us on and help contribute to a better and safer Mandaluyong City!</p>
+        </div>
+    </div>
+{% endblock %}

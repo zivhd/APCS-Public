@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit User{% endblock %}
+
+{% block content %}
+  <div style="display: flex; justify-content: center; align-items: center; height: 100vh;" class="bg-gray-100">
+    <div class="mt-10 px-12 py-5 lg:px-8 bg-white rounded-md shadow-md max-w-xl w-full">
+      <div class="px-3">
+        <h2 class="text-2xl font-bold tracking-tight text-gray-900 text-center mb-5">Edit User</h2>
+        <form method="post" action="{{ url_for('edit_user', user_id=user['_id']) }}">
+          <label for="fname" class="text-gray-500">First Name</label>
+          <input type="text" name="fname" value="{{ user['fname'] }}" required  class="w-full border-gray-300 rounded-md shadow-sm focus:border-orange-500 focus:ring focus:ring-orange-500 focus:ring-opacity-50"><br><br>
+
+          <label for="lname" class="text-gray-500">Last Name</label>
+          <input type="text" name="lname" value="{{ user['lname'] }}" required class="w-full border-gray-300 rounded-md shadow-sm focus:border-orange-500 focus:ring focus:ring-orange-500 focus:ring-opacity-50"><br><br>
+
+          <label for="email" class="text-gray-500">Email</label>
+          <input type="email" name="email" value="{{ user['email'] }}" required class="w-full border-gray-300 rounded-md shadow-sm focus:border-orange-500 focus:ring focus:ring-orange-500 focus:ring-opacity-50"><br><br>
+          
+          <label for="role" class="text-gray-500">Role</label>
+          <select name="role" required class="w-full border-gray-300 rounded-md shadow-sm focus:border-orange-500 focus:ring focus:ring-orange-500 focus:ring-opacity-50 p-2">
+              <option value="Contributor" {% if user['role'] == 'Contributor' %} selected {% endif %}>Contributor</option>
+              <option value="Admin" {% if user['role'] == 'Admin' %} selected {% endif %}>Admin</option>
+              <option value="TPMO" {% if user['role'] == 'TPMO' %} selected {% endif %}>TPMO</option>
+              <option value="Engineering" {% if user['role'] == 'Engineering' %} selected {% endif %}>Engineering</option>
+              <option value="Engineering Head" {% if user['role'] == 'Engineering Head' %} selected {% endif %}>Engineering Head</option>
+              <option value="TPMO Head" {% if user['role'] == 'TPMO Head' %} selected {% endif %}>TPMO Head</option>
+          </select><br><br>
+
+          <label for="password" class="text-gray-500">Password</label>
+          <input type="password" name="password" class="w-full border-gray-300 rounded-md shadow-sm focus:border-orange-500 focus:ring focus:ring-orange-500 focus:ring-opacity-50"><br><br>
+
+          <input type="submit" value="Update" class="w-full flex justify-center rounded-md bg-orange-600 px-4 py-2 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-orange-500 focus:outline-none focus:border-orange-700 focus:ring focus:ring-orange-500 focus:ring-opacity-50">
+        </form>
+      </div>
+    </div>
+  </div>
+{% endblock %}

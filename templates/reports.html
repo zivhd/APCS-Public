@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% block title %}Reports{% endblock %}
+{% block head %}
+<script>
+    function toggleDateFields() {
+        var reportType = document.getElementById('report_type').value;
+        var startDateField = document.getElementById('start_date_field');
+        var endDateField = document.getElementById('end_date_field');
+
+        if (reportType === '3' || reportType === '2' || reportType === '6') {
+            var startDateInput = document.getElementById('start_date');
+            var endDateInput = document.getElementById('end_date');
+            startDateField.style.display = 'none';
+            endDateField.style.display = 'none';
+            startDateInput.value = '9999-01-01';
+            endDateInput.value = '9999-01-01';
+        } else {
+            var startDateInput = document.getElementById('start_date');
+            var endDateInput = document.getElementById('end_date');
+            startDateField.style.display = 'block';
+            endDateField.style.display = 'block';
+            startDateInput.value = '';
+            endDateInput.value = '';
+        }
+    }
+
+    function handleSubmit() {
+        var reportType = document.getElementById('report_type').value;
+        var startDateInput = document.getElementById('start_date');
+        var endDateInput = document.getElementById('end_date');
+
+        if (reportType === '3' || reportType === '2' || reportType === '6') {
+            console.log("HERE!!!!")
+            startDateInput.value = '9999-01-01';
+            endDateInput.value = '9999-01-01';
+        }
+    }
+
+    function handleStartDateInput() {
+    var startDate = document.getElementById("start_date").value;
+
+    var completionDate = document.getElementById("end_date");
+
+    if (startDate) {
+        completionDate.setAttribute("min", startDate);
+    }
+}
+</script>
+{% endblock %}
+{% block content %}
+<body class = "bg-slate-100">
+<div class="flex items-center justify-center ">
+    <div class = "mt-12 w-2/5 mx-12">
+    <p class="text-4xl text-orange-600 font-bold px-5 mt-12">Reports</p>
+    <div class="grid grid-cols-4 gap-4 grid-flow-row-dense p-5 ">
+        <!-- Enclosed Form in White Box -->
+        <div class="container col-span-4 px-12 py-6 w-full bg-white shadow-md rounded">
+            <form action="/generate_report" method="POST" onsubmit="handleSubmit()">
+                <div class="mb-4">
+                    <label for="report_type" class="block text-sm font-semibold mb-2 ">Report Type:</label>
+                    <select id="report_type" name="report_type" class="px-6 py-2 border rounded-md w-full" onchange="toggleDateFields()">
+                        <option value="1">Resolved Segments with Potholes</option>
+                        <option value="2">Unresolved Segments with Potholes</option>
+                        <option value="3">In Progress Segments with Potholes</option>
+                        <option value="4">Contributed Potholes</option>
+                        <option value="5">Validated Potholes</option>
+                        <option value="6">Unvalidated Potholes</option>
+                        <option value="7">Accepted Potholes</option>
+                        <option value="8">Rejected Potholes</option>
+                    </select>
+                </div>
+                <div class="mb-4" id="start_date_field">
+                    <label for="start_date" class="block text-sm font-semibold mb-2">Start Date:</label>
+                    <input type="date" id="start_date" name="start_date" class="px-4 py-2 border rounded-md w-full" required oninput="handleStartDateInput()">
+                </div>
+                <div class="mb-4" id="end_date_field">
+                    <label for="end_date" class="block text-sm font-semibold mb-2">End Date:</label>
+                    <input type="date" id="end_date" name="end_date" class="px-4 py-2 border rounded-md w-full" required>
+                </div>
+                <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded float-right">Generate Report</button>
+            </form>
+        </div>
+    </div>
+</div>
+</div>
+</body>
+<script>
+    // Call toggleDateFields initially to set the initial state
+    toggleDateFields();
+</script>
+{% endblock %}

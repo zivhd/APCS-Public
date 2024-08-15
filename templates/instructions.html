@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+
+{% block title %}About Us{% endblock %}
+
+{% block content %}
+    <div class="container mx-auto p-4 bg-slate-100 rounded-lg shadow-lg">
+
+        <h1 class="text-4xl font-bold mt-20 mb-6 text-center text-orange-600">Dashcam Upload Instructions</h1>
+
+   
+
+        <p class="mb-8 text-lg text-gray-800">
+            To provide step-by-step instructions on how to set up the phone
+                camera for data collection. By following the instructions, you
+                will be able to position and configure their camera in a way
+                that allows you to capture the necessary data. This will cover
+                the necessary steps for setting up the camera, including
+                positioning, settings, and ensuring that the images captured
+                meet the requirements for valid data collection. You can expect
+                to gain an understanding of how to set up the camera effectively
+                for data collection and ensure that the videos are suitable for
+                upload and processing.
+        </p>
+
+        <h1 class="text-2xl font-bold mt-20 mb-6 text-center text-orange-600">Camera Setup</h1>
+        <div class="flex items-center">
+            <ol
+              class="mb-8 text-lg text-gray-800"
+            >
+              <li>
+                Enable the location feature on your phone before recording
+                videos of the road. This will ensure that there is metadata with
+                geolocation information that can be extracted by the system.
+              </li>
+              <li>
+                Mount the camera on top of the dashboard or near the flat
+                mirror, positioning it in the middle to capture the road scenes
+                effectively.
+              </li>
+              <img
+              class="w-1/2 mx-auto"
+              src="{{url_for('static', filename='images/camera-setup.png')}}"
+              alt="Near or in the middle of an intersectione"
+            />
+              <li>
+                Before starting your drive, it's important to begin recording
+                using the third-party application. To ensure that the footage is
+                synchronized, make sure that both the third-party application
+                and your phone's built-in camera are recording simultaneously.
+              </li>
+              <li>
+                After you have finished recording, it's important to check the
+                file to ensure that it is a valid recording.  This can be done by reviewing the file and making sure that
+                it contains the entire duration of your drive and that the
+                footage is clear and unobstructed. You can also check if the
+                file is compatible with the third-party application that you are
+                using. If the file is not valid, you may need to re-record your
+                drive to ensure that you have a reliable and accurate record of
+                your trip."
+              </li>
+            </ol>
+          </div>
+
+          <h1 class="text-2xl font-bold mt-20 mb-6 text-center text-orange-600">Third-party application</h1>
+
+          <div class="flex items-center">
+            <ul
+              class="mb-8 text-lg text-gray-800"
+            >
+              <li>
+                Download the GPS Logger app or any similar app on your phone and
+                open the application.
+              </li>
+
+              <li>
+                Take Note: You may use any third-party application similar to
+                GPS Logges as long as it can get the
+                <span class="italic text-yellow-500"
+                  >latitude, longitude and altitude</span
+                >
+                of the data.
+              </li>
+
+              <li>
+                For GPS Logger
+                <ol
+                  class="mb-8 text-lg text-gray-800"
+                >
+                  <li>
+                    Open the app and click the "Record" button to start the GPS
+                    tracking.
+                  </li>
+                  <img
+                    class="w-1/4 mx-auto"
+                    src="{{url_for('static', filename='images/camera-setup(1).png')}}"
+                    alt="Camera Setup"
+                  />
+                  <li>
+                    Once the GPS Logger starts recording, you may open your
+                    phone camera app and start recording video.
+                  </li>
+                  <li>
+                    After recording, stop the GPS Logger app to end the tracking
+                    session. The GPS data will be saved in the track list.
+                  </li>
+                  <img
+                    class="w-1/4 mx-auto"
+                    src="{{url_for('static', filename='images/camera-setup(2).png')}}"
+                    alt="Camera Setup"
+                  />
+                  <li>
+                    To access the recorded data, click on any of the tracks in
+                    the list.
+                  </li>
+                  <img
+                    class="w-1/4 mx-auto"
+                    src="{{url_for('static', filename='images/camera-setup(3).png')}}"
+                    alt="Camera Setup"
+                  />
+                  <li>
+                    On the top right corner of the screen, you will find options
+                    to edit, share, download, and delete the track.
+                  </li>
+                  <img
+                    class="w-1/4 mx-auto"
+                    src="{{url_for('static', filename='images/camera-setup(4).png')}}"
+                    alt="Camera Setup"
+                  />
+                  <li>
+                    Download the track to generate a GPX file, which will
+                    contain information such as latitude, longitude, altitude,
+                    time, and speed.
+                    <br />
+                    Shown below is the sample content of the GPX file from the
+                    GPS Logger app.
+                  </li>
+                  <img
+                    class="w-full mx-auto"
+                    src="{{url_for('static', filename='images/camera-setup(5).png')}}"
+                    alt="Camera Setup"
+                  />
+                </ol>
+              </li>
+            </ul>
+          </div>
+
+          <h1 class="text-2xl font-bold mt-20 mb-6 text-center text-orange-600">Uploading to APCS</h1>
+          
+        <p class="mb-8 text-lg text-gray-800">
+            After properly capturing both the GPS coordinates and the mp4 video, navigate to the <a href="/contribute" class="text-orange-600 hover:underline">contribute</a> page to upload the files under the "Upload Dashcam Footage" section
+        </p>
+
+        <p class="mb-8 text-lg text-gray-800 text-center">
+            If you have any questions or feedback, please don't hesitate to <a href="/contactus" class="text-orange-600 hover:underline">contact us</a>.
+        </p>
+
+
+    </div>
+{% endblock %}

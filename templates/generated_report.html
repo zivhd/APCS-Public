@@ -1,0 +1,335 @@
+{% extends 'base.html' %}
+{% block title %}
+    {% if report_type == 1 %}
+        Resolved Segments Report
+    {% elif report_type == 2 %}
+        Unresolved Segments Report
+    {% elif report_type == 3 %}
+        In-Progress Segments Report
+    {% elif report_type == 4 %}
+        Contributions Report
+    {% elif report_type == 5 %}
+        Validated Contributions Report
+    {% elif report_type == 6 %}
+        Unvalidated Contributions Report
+    {% elif report_type == 7 %}
+        Accepted Contributions Report
+    {% elif report_type == 8 %}
+        Rejected Contributions Report
+    {% endif %}
+{% endblock %}
+
+{% block head %}
+<style>
+    /* Define styles for the notification */
+    .notification {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 20px;
+        border-radius: 5px;
+        z-index: 1000;
+        display: none; /* Initially hide the notification */
+    }
+    
+    .table-container {
+        max-height: 450px; /* Adjust this value based on your layout */
+        overflow-y: auto;
+    }
+
+    #report-table thead {
+        position: sticky;
+        top: 0;
+        background-color: #fff;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<body class="bg-slate-100">
+    <div class="flex items-center justify-center">
+        <div class="mt-12">
+            <p id="report-header" class="text-4xl text-orange-600 font-bold mt-10 mb-4"></p>
+            {% if start_date != "9999-01-01" and end_date != "9999-01-01" %}
+                <p id="dates" class="text-2xl text-gray-600 font-semibold mt-2 mb-4">Report Generated for {{ start_date }} - {{ end_date }}</p>
+            {% endif %}
+            <div class="table-container overflow-y-auto">
+                <table id="report-table" class="w-full bg-white shadow-md rounded-xl">
+                    <thead>
+                        <tr id="headers" class="bg-orange-600 text-white rounded-md text-sm"></tr>
+                    </thead>
+                    <tbody class="text-blue-gray-900"></tbody>
+                </table>
+            </div>
+            <p id="no-records" class="hidden">No records found.</p>
+
+            <!-- Download as PDF Button -->
+            <div class="text-center mt-8 mb-3">
+                <a href="#" id="download-pdf-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded inline-block">
+                    Download as PDF
+                </a>
+                <a href="/reports" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded inline-block">
+                    Go back to Reports
+                </a>
+            </div>
+            <!-- Notification -->
+            <div id="notification" class="notification">PDF Downloaded Successfully</div>
+        </div>
+    </div>
+</body>
+
+<script>
+
+    function createTable(){
+        var reportType = '{{report_type}}'
+        console.log("test")
+        const table = document.getElementById('report-table');
+        const reportsheader = document.getElementById("report-header");
+        const dates = document.getElementById("dates");
+        const thead = table.getElementsByTagName('thead')[0];
+        const tbody = table.getElementsByTagName('tbody')[0];
+        const headerRow = document.getElementById('headers');
+     
+        var tableHeaders;
+        
+
+        switch(reportType){
+            case "1":
+                reportsheader.textContent = "Resolved Segments Report";
+                '{% if not contributions  %}'
+                table.classList.add("hidden")
+                document.getElementById("no-records").classList.remove('hidden')
+                '{% endif %}'
+                tableHeaders = ["Job Order Start Date", "Job Order Completion Date" , "Roads Affected" , "Barangays Affected", "Person-In-Charge", "Priority Level"]
+                tableHeaders.forEach(headerText => {
+                    const th = document.createElement('th')
+                    th.classList.add("py-3", "px-10");
+                    th.textContent = headerText;
+                    headerRow.appendChild(th);
+                });
+                thead.appendChild(headerRow);
+                '{% for contribution in contributions %}'
+  
+                var row = document.createElement('tr');
+                row.classList.add("border-b", "border-blue-gray-200")
+                row.innerHTML = `
+                <td class="py-3 text-sm text-center">{{ contribution.startdate }}</td>
+                <td class="py-3 text-sm text-center">{{ contribution.enddate }}</td>
+                <td class="py-3 text-sm text-center">{{ contribution.road_name }}</td>
+                <td class="py-3 text-sm text-center">{{ contribution.barangay }}</td>
+                <td class="py-3 text-sm text-center">{{ contribution.incharge }}</td>
+                <td class="py-3 text-sm text-center px-5">{{ contribution.prio }}</td>
+                `;
+                tbody.appendChild(row);
+                '{% endfor %}'
+
+                break;
+            case "2":
+                reportsheader.textContent = "Unresolved Segments Report";
+                '{% if not contributions  %}'
+                table.classList.add("hidden")
+                document.getElementById("no-records").classList.remove('hidden')
+                '{% endif %}'
+                tableHeaders = ["Roads Affected", "Barangays Affected" , "Priority Level"]
+                tableHeaders.forEach(headerText => {
+                    const th = document.createElement('th');
+                    th.classList.add("py-3", "px-20");
+                    th.textContent = headerText;
+                    headerRow.appendChild(th);
+                });
+                thead.appendChild(headerRow);
+                '{% for contribution in contributions %}'
+                var row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="py-3 text-sm text-center">{{ contribution.road_name }}</td>
+                    <td class="py-3 text-sm text-center">{{ contribution.barangay }}</td>
+                    <td class="py-3 text-sm text-center px-5">{{ contribution.prio }}</td>
+                `;
+                tbody.appendChild(row);
+                '{% endfor %}'
+                break;
+            case "3":
+                reportsheader.textContent = "In Progress Segments Report";
+                '{% if not contributions  %}'
+                table.classList.add("hidden")
+                document.getElementById("no-records").classList.remove('hidden')
+                '{% endif %}'
+                tableHeaders = ["Job Order Start Date", "Roads Affected" , "Barangays Affected" , "Person-In-Charge", "Priority Level"]
+                tableHeaders.forEach(headerText => {
+                    const th = document.createElement('th');
+                    th.classList.add("py-3", "px-10");
+                    th.textContent = headerText;
+                    headerRow.appendChild(th);
+                });
+                thead.appendChild(headerRow);
+                '{% for contribution in contributions %}'
+                var row = document.createElement('tr');
+                row.innerHTML = `
+                <td class="py-3 text-sm text-center">{{ contribution.startdate }}</td>
+                <td class="py-3 text-sm text-center">{{ contribution.road_name }}</td>
+                <td class="py-3 text-sm text-center">{{ contribution.barangay }}</td>
+                <td class="py-3 text-sm text-center">{{ contribution.incharge }}</td>
+                <td class="py-3 text-sm text-center px-5">{{ contribution.prio }}</td>
+                `;
+                tbody.appendChild(row);
+                '{% endfor %}'
+                break;
+            case "4":
+                reportsheader.textContent = "Contributed Road Damages";
+                '{% if not contributions  %}'
+                table.classList.add("hidden")
+                document.getElementById("no-records").classList.remove('hidden')
+                '{% endif %}'
+                tableHeaders = ["Date", "Road Name" , "Barangay" , "Contributor", "Contributor Role"]
+                tableHeaders.forEach(headerText => {
+                    const th = document.createElement('th');
+                    th.classList.add("py-3", "px-20");
+                    th.textContent = headerText;
+                    headerRow.appendChild(th);
+                });
+                thead.appendChild(headerRow);
+                '{% for contribution in contributions %}'
+                var row = document.createElement('tr');
+                row.innerHTML = `
+                <td class="py-3 text-sm text-center px-10">{{ contribution.timestamp }}</td>
+                <td class="py-3 text-sm text-center">{{ contribution.road_name }}</td>
+                <td class="py-3 text-sm text-center">{{ contribution.barangay }}</td>
+                <td class="py-3 text-sm text-center">{{ contribution.contributor }}</td>
+                <td class="py-3 text-sm text-center">{{ contribution.contributor_role }}</td>
+                `;
+                tbody.appendChild(row);
+                '{% endfor %}'
+                break;
+            case "5":
+                reportsheader.textContent = "Validated Road Damages";
+                '{% if not contributions  %}'
+                table.classList.add("hidden")
+                document.getElementById("no-records").classList.remove('hidden')
+                '{% endif %}'
+                tableHeaders = ["Date", "Road Name" , "Barangay" , "Contributor", "Contributor Role", "Validator", "Validation Date"]
+                tableHeaders.forEach(headerText => {
+                    const th = document.createElement('th');
+                    th.classList.add("py-3", "px-12");
+                    th.textContent = headerText;
+                    headerRow.appendChild(th);
+                });
+                thead.appendChild(headerRow);
+                '{% for contribution in contributions %}'
+                var row = document.createElement('tr');
+                row.innerHTML = `
+                <td class="py-3 text-sm text-center px-5">{{ contribution.timestamp }}</td>
+                <td class="py-3 text-sm text-center">{{ contribution.road_name }}</td>
+                <td class="py-3 text-sm text-center">{{ contribution.barangay }}</td>
+                <td class="py-3 text-sm text-center">{{ contribution.contributor }}</td>
+                <td class="py-3 text-sm text-center">{{ contribution.contributor_role }}</td>
+                <td class="py-3 text-sm text-center">{{ contribution.validator }}</td>
+                <td class="py-3 text-sm text-center">{{ contribution.validation_date }}</td>
+                `;
+                tbody.appendChild(row);
+                '{% endfor %}'
+                break;
+            case "6":
+            reportsheader.textContent = "Unvalidated Road Damages";
+            '{% if not contributions  %}'
+                table.classList.add("hidden")
+                document.getElementById("no-records").classList.remove('hidden')
+                '{% endif %}'
+                tableHeaders = ["Date", "Road Name" , "Barangay" , "Contributor", "Contributor Role"]
+                tableHeaders.forEach(headerText => {
+                    const th = document.createElement('th');
+                    th.classList.add("py-3", "px-20");
+                    th.textContent = headerText;
+                    headerRow.appendChild(th);
+                });
+                thead.appendChild(headerRow);
+                '{% for contribution in contributions %}'
+                var row = document.createElement('tr');
+                row.innerHTML = `
+                <td class="py-3 text-sm text-center">{{ contribution.timestamp }}</td>
+                <td class="py-3 text-sm text-center">{{ contribution.road_name }}</td>
+                <td class="py-3 text-sm text-center">{{ contribution.barangay }}</td>
+                <td class="py-3 text-sm text-center">{{ contribution.contributor }}</td>
+                <td class="py-3 text-sm text-center">{{ contribution.contributor_role }}</td>
+                `;
+                tbody.appendChild(row);
+                '{% endfor %}'
+                break;
+            case "7":
+            reportsheader.textContent = "Accepted Road Damages";
+            '{% if not contributions  %}'
+                table.classList.add("hidden")
+                document.getElementById("no-records").classList.remove('hidden')
+                '{% endif %}'
+                tableHeaders = ["Contribution Date", "Road Name" , "Barangay" , "Contributor", "Contributor Role", "Validator", "Validation Date" ]
+                tableHeaders.forEach(headerText => {
+                    const th = document.createElement('th');
+                    th.classList.add("py-3", "px-10");
+                    th.textContent = headerText;
+                    headerRow.appendChild(th);
+                });
+                thead.appendChild(headerRow);
+                '{% for contribution in contributions %}'
+                var row = document.createElement('tr');
+                row.innerHTML = `
+                <td class="py-3 text-sm text-center px-5">{{ contribution.timestamp }}</td>
+                <td class="py-3 text-sm text-center">{{ contribution.road_name }}</td>
+                <td class="py-3 text-sm text-center">{{ contribution.barangay }}</td>
+                <td class="py-3 text-sm text-center">{{ contribution.contributor }}</td>
+                <td class="py-3 text-sm text-center">{{ contribution.contributor_role }}</td>
+                <td class="py-3 text-sm text-center">{{ contribution.validator }}</td>
+                <td class="py-3 text-sm text-center px-5">{{ contribution.validation_date }}</td>
+                `;
+                tbody.appendChild(row);
+                '{% endfor %}'
+                break;
+                case "8":
+            reportsheader.textContent = "Rejected Road Damages";
+            '{% if not contributions  %}'
+                table.classList.add("hidden")
+                document.getElementById("no-records").classList.remove('hidden')
+                '{% endif %}'
+                tableHeaders = ["Contribution Date", "Road Name" , "Barangay" , "Contributor", "Contributor Role", "Validator", "Validation Date" ]
+                tableHeaders.forEach(headerText => {
+                    const th = document.createElement('th');
+                    th.classList.add("py-3", "px-10");
+                    th.textContent = headerText;
+                    headerRow.appendChild(th);
+                });
+                thead.appendChild(headerRow);
+                '{% for contribution in contributions %}'
+                var row = document.createElement('tr');
+                row.innerHTML = `
+                <td class="py-3 text-sm text-center">{{ contribution.timestamp }}</td>
+                <td class="py-3 text-sm text-center">{{ contribution.road_name }}</td>
+                <td class="py-3 text-sm text-center">{{ contribution.barangay }}</td>
+                <td class="py-3 text-sm text-center">{{ contribution.contributor }}</td>
+                <td class="py-3 text-sm text-center">{{ contribution.contributor_role }}</td>
+                <td class="py-3 text-sm text-center">{{ contribution.validator }}</td>
+                <td class="py-3 text-sm text-center">{{ contribution.validation_date }}</td>
+                `;
+                tbody.appendChild(row);
+                '{% endfor %}'
+                break;
+        }
+        
+    }
+    createTable()
+    
+    document.getElementById('download-pdf-btn').addEventListener('click', function () {
+        var printContents = document.getElementById('report-table').outerHTML;
+        var originalContents = document.body.innerHTML;
+        document.body.innerHTML = printContents;
+        window.print();
+        document.body.innerHTML = originalContents;
+        // Show the notification
+        document.getElementById('notification').style.display = 'block';
+        // Hide the notification after 3 seconds
+        setTimeout(function() {
+            document.getElementById('notification').style.display = 'none';
+        }, 3000);
+    });
+</script>
+{% endblock %}

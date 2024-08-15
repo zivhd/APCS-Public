@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block title %}Add User{% endblock %}
+
+{% block content %}
+<div class="flex min-h-screen items-center justify-center">
+    {% if error %}
+        <p style="color: red;">{{ error }}</p>
+    {%endif %}
+    <form class="w-full max-w-lg" method="POST">
+        <div class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="fname">
+                    First Name
+                </label>
+                <input class="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="fname" name="fname" type="text" placeholder="First Name" required>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="lname">
+                    Last Name
+                </label>
+                <input class="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="lname" name="lname" type="text" placeholder="Last Name" required>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="email">
+                    Email
+                </label>
+                <input class="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="email" name="email" type="email" placeholder="Email" required>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="role">
+                    Role
+                </label>
+                <div class="relative">
+                    <select class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="role" name="role" required>
+                        <option value="">Select Role</option>
+                        <option value="Contributor">Contributor</option>
+                        <option value="Admin">Admin</option>
+                        <option value="TPMO">TPMO</option>
+                        <option value="Engineering">Engineering</option>
+                        <option value="Engineering Head">Engineering Head</option>
+                        <option value="TPMO Head">TPMO Head</option>
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                        <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                            <path fill="#000000" d="M10 12c-.5 0-1-.5-1-1 0-.5.5-1 1-1s1 .5 1 1c0 .5-.5 1-1 1zm2-4v-.9l4.4-4.4c.4-.4.4-1 0-1.4s-1-.4-1.4 0l-4.4 4.4h-.9l-4.4-4.4c-.4-.4-1-.4-1.4 0s-.4 1 0 1.4l4.4 4.4v.9l-4.4 4.4c-.4.4-.4 1 0 1.4.2.2.4.3.7.3s.5-.1.7-.3l4.4-4.4h.9l4.4 4.4c.2.2.4.3.7.3s.5-.1.7-.3c.4-.4.4-1 0-1.4l-4.4-4.4z"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="password">
+                    Password
+                </label>
+                <input class="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="password" name="password" type="password" placeholder="Password" required>
+            </div>
+            <div class="mb-6">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="confirm_password">
+                    Confirm Password
+                </label>
+                <input class="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="confirm_password" name="confirm_password" type="password" placeholder="Confirm Password" required>
+            </div>
+            <div class="flex items-center justify-between">
+                <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
+                    Add User
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
